@@ -1,6 +1,7 @@
 extern crate serde;
 extern crate serde_json;
 
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Workstruct {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -15,7 +16,11 @@ pub struct Workstruct {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
-    pub attemps: u32,
-    pub monitor:bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attemps: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub monitor:Option<bool>,
     pub work: Vec<Workstruct>
 }
+
+pub static  NEWJSON :&str= "{\"work\": []}";

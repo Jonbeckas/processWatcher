@@ -5,8 +5,8 @@ use std::error::Error;
 pub fn check_running(s:String)-> bool {
     let mut system = sysinfo::System::new_all();
     system.refresh_all();
-    for (pid, proc_) in system.get_processes() {
-        if proc_.name() == s {
+    for (_pid, proc) in system.get_processes() {
+        if proc.name() == s {
             return true;
         }
     }

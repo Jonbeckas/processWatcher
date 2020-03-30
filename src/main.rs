@@ -9,7 +9,7 @@ use std::process::exit;
 use std::path::{Path, PathBuf};
 use std::{fs, thread, time};
 use std::borrow::Borrow;
-use crate::structs::{Config, Workstruct};
+use crate::structs::{Config, Workstruct, NEWJSON};
 mod structs;
 mod processes;
 
@@ -64,7 +64,7 @@ fn run_json(json:Vec<Workstruct>)-> Result<(),Box<dyn Error>> {
                 }
             }
         }
-        /*if !js.linkconf.is_none() {
+        if !js.linkconf.is_none() {
             let mut path_buf = PathBuf::new();
             path_buf.push(js.linkconf.unwrap());
             let path:&Path = path_buf.as_path();
@@ -73,13 +73,13 @@ fn run_json(json:Vec<Workstruct>)-> Result<(),Box<dyn Error>> {
                 _ => {}
             }
             match read_data_from_json(path) {
-                Ok(json)=> match run_json(json) {
+                Ok(json)=> match run_json(json.work) {
                     Ok(())=>(),
                     Err(e)=> error!("{}",e.to_string())
                 }
                 Err(e)=> error!("Error while parsing the json: {:?}", e.to_string())
             }
-        }*/
+        }
     }
     Ok(())
 }
@@ -98,7 +98,7 @@ fn create_file(path:&Path) ->Result<(),Box<dyn Error>>{
     std::fs::create_dir_all(path.parent().unwrap())?;
     if !path.exists() {
         File::create(path)?;
-        fs::write(path,"[]")?;
+        fs::write(path,NEWJSON)?;
         info!("Configuration file at {} does not exist, creating one", path.to_str().unwrap());
     }
     Ok(())
