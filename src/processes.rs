@@ -92,7 +92,7 @@ impl KeepAliveParams {
 
     fn get_logfile (&mut self) -> File {
         let folder =  std::env::current_exe().ok().expect("Error while open configuration Folder");
-        let folder = folder.parent().unwrap();
+        let folder = folder.as_path();
         let mut path_buf = PathBuf::new();
         path_buf.push(folder.parent().unwrap());
         path_buf.push("logs");
