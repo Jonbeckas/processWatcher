@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  buildlin:
 
     runs-on: ubuntu-latest
 
@@ -15,6 +15,23 @@ jobs:
         uses: actions/checkout@v2
       - name: Build for Linux
         run: cargo build --release
+      - uses: actions/upload-artifact@v2
+        with:
+            name: linux-build
+            path: ./release/process_watcher
+
+  buildwin:
+    needs: [buildlin]
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: action/checkout@3
+      - name: build
+        run: cargo build --release
+      - uses: actions/download-artifact@v2
+        with:
+          name: linux-build
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -27,8 +44,18 @@ jobs:
             For changes see commits
           draft: false
           prerelease: false
-      - name: Upload Release Asset Linux
+      - name: Upload Release Asset Windows
         id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./release/process_watcher.exe
+          asset_name: process_watcher.exe
+          asset_content_type: application/x-msdownload
+      - name: Upload Release Asset Linux
+        id: upload-release-asset-lin 
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,4 +64,3 @@ jobs:
           asset_path: ./release/process_watcher
           asset_name: process_watcher
           asset_content_type: application/x-elf
-    
