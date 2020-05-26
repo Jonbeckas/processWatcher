@@ -35,7 +35,7 @@ fn main(){
         let config: Config;
         match read_data_from_json(path) {
             Ok(jso) => {
-                match run_json(jso.clone(),jso.clone().attemps) {
+                match run_json(jso.clone(),jso.clone().attempts) {
                     Ok(()) =>(),
                     Err(e) => error!("{}",e.to_string())
                 }
@@ -88,7 +88,7 @@ fn run_json(json:Config,attempts:Option<u64>)-> Result<(),Box<dyn Error>> {
                 _ => {}
             }
             match read_data_from_json(path) {
-                Ok(jso)=> match run_json(jso,json.clone().attemps) {
+                Ok(jso)=> match run_json(jso,json.clone().attempts) {
                     Ok(())=>(),
                     Err(e)=> error!("ERR{}",e.to_string())
                 }
@@ -122,10 +122,8 @@ fn run_json(json:Config,attempts:Option<u64>)-> Result<(),Box<dyn Error>> {
                     }
                     let mut keep_alive = KeepAlive::new(attempts.unwrap(),js.keepalive.clone().unwrap());
                     keep_alive.start();
-                    unsafe {
-                        KEEP_ALIVES.push(keep_alive)
-                    }
-                    info!("Start KeepAlive Task for {}. Append logs to {}", js.keepalive.clone().unwrap(), path.display() )
+                    KEEP_ALIVES.push(keep_alive);
+                    info!("Start KeepAlive Task for {}. Append logs to {}", js.keepalive.clone().unwrap(), path.display());
                 }
             }
 
@@ -136,7 +134,7 @@ fn run_json(json:Config,attempts:Option<u64>)-> Result<(),Box<dyn Error>> {
 
 fn get_path()-> Box<Path> {
     let folder =  std::env::current_exe().ok().expect("Error while open configuration Folder");
-    let folder = folder.parent().unwrap();
+    let folder = folder.as_path();
     let mut path_buf = PathBuf::new();
     path_buf.push(folder.parent().unwrap());
     path_buf.push("config");
@@ -145,8 +143,8 @@ fn get_path()-> Box<Path> {
 }
 
 fn create_file(path:&Path) ->Result<(),Box<dyn Error>>{
-    std::fs::create_dir_all(path.parent().unwrap())?;
-    if !path.exists() {
+    std::fs::create_dir_all(path.clone().parent().unwrap())?;
+    if !path.exists(){
         File::create(path)?;
         fs::write(path,NEWJSON)?;
         info!("Configuration file at {} does not exist, creating one", path.to_str().unwrap());

@@ -6,7 +6,7 @@ use std::{thread};
 use std::sync::{Mutex, Arc};
 use std::path::{PathBuf, Path};
 use std::fs::{OpenOptions, File};
-use std::io::{Write, Stdout, BufReader, BufRead};
+use std::io::{Write, BufReader, BufRead};
 use self::chrono::Utc;
 
 pub fn check_running(s:String)-> bool {
@@ -27,7 +27,7 @@ pub fn start_process(s:String)->Result<String,Box<dyn Error>> {
     for arg in tokens {
         command.arg(arg);
     }
-    let running = command.spawn()?;
+    command.spawn()?;
     Ok(String::new())
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]

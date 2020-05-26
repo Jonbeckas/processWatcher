@@ -19,11 +19,11 @@ pub struct Workstruct {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub attemps: Option<u64>,
+    pub attempts: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub refresh:Option<u64>,
     pub work: Vec<Workstruct>
 }
 
 
-pub static  NEWJSON :&str= "{\"work\": []}";
+pub static  NEWJSON :&str= "{ \"attempts\":5,\"refresh\":10,\"work\": []}";
