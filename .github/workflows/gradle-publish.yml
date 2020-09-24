@@ -22,6 +22,8 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
     - name: Build with Unix
       run: gradle buildUnix
+    - name: Set jarFile
+      run: echo ::set-env name=JARFILE::$(ls ./build/libs/*.jar| head -1)
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -41,7 +43,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./build/*.jar
+        asset_path: ${{env.JARFILE}}
         asset_name: processWatcher.jar
         asset_content_type:  application/java-archive
     - name: Upload Release Asset Unix
