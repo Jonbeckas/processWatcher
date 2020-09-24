@@ -1,0 +1,70 @@
+name: Rust
+
+on:
+  create:
+    tags: 
+      - 'v*'
+
+jobs:
+  buildlin:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build for Linux
+        run: cargo build --release
+      - name: ls
+        run: ls -la
+      - uses: actions/upload-artifact@v2
+        with:
+            name: linux-build
+            path: ./target/release/process_watcher
+
+  buildwin:
+    needs: [buildlin]
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: build
+        run: cargo build --release
+      - uses: actions/download-artifact@v2
+        with:
+          name: linux-build
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            For changes see commits
+          draft: false
+          prerelease: false
+      - name: dir
+        run: dir
+      - name: Upload Release Asset Windows
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./target/release/process_watcher.exe
+          asset_name: process_watcher.exe
+          asset_content_type: application/x-msdownload
+      - name: Upload Release Asset Linux
+        id: upload-release-asset-lin 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./process_watcher
+          asset_name: process_watcher
+          asset_content_type: application/x-elf

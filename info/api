@@ -1,0 +1,20 @@
+//Keepalive
+types: start, stop, disable, enable
+values: keepAliveid
+
+
+//Deamon
+type: service
+values: start, stop
+
+
+
+
+///PWM
+
+log <id> -> shows logs (acces files)
+service start/stop -> start stops watcher
+start/stop/disable/enable <id> ->
+
+
+{"key":"START","value":"lol"}
