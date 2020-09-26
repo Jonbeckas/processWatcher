@@ -1,4 +1,5 @@
 import java.io.File
+import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -15,37 +16,55 @@ class Utils {
         fun getOsPathWithOut(): String {
             return if (isUnix()) {
                 val file = File("/usr/share/processwatcher/")
+                try {
+                    file.mkdirs()
+                } catch (e:IOException) {
+                    getAlternativesOut()
+                }
                 if (file.canWrite()) {
                     file.path;
                 } else {
-                    val jarPath = File(getCleanPath())
-                    if (jarPath.canWrite()) {
-                        println("Cannot acces /usr/share/processwatcher/. Writing instead to '${jarPath.path}'")
-                        jarPath.path
-                    } else {
-                        val local = System.getProperty("user.dir")
-                        println("Cannot acces ${jarPath}. Writing instead to '${local}'")
-                        local
-                    }
+                    getAlternativesOut()
                 }
             } else {
                 getCleanPath();
             }
         }
 
+        private fun getAlternativesOut(): String {
+            val jarPath = File(getCleanPath())
+            return if (jarPath.canWrite()) {
+                println("Cannot acces /usr/share/processwatcher/. Writing instead to '${jarPath.path}'")
+                jarPath.path
+            } else {
+                val local = System.getProperty("user.dir")
+                println("Cannot acces ${jarPath}. Writing instead to '${local}'")
+                local
+            }
+        }
+
+        private fun getAlternatives(): String {
+            val jarPath = File(getCleanPath())
+            return if (jarPath.canWrite()) {
+                jarPath.path
+            } else {
+                val local = System.getProperty("user.dir")
+                local
+            }
+        }
+
         fun getOsPath(): String {
             return if (isUnix()) {
                 val file = File("/usr/share/processwatcher/")
+                try {
+                    file.mkdirs()
+                } catch (e:IOException) {
+                    getAlternativesOut()
+                }
                 if (file.canWrite()) {
                     file.path;
                 } else {
-                    val jarPath = File(getCleanPath())
-                    if (jarPath.canWrite()) {
-                        jarPath.path
-                    } else {
-                        val local = System.getProperty("user.dir")
-                        local
-                    }
+                    getAlternatives()
                 }
             } else {
                 getCleanPath();
