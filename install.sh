@@ -43,7 +43,7 @@ function checkjava() {
     done
     echo Detect Java "$result"
     if [ "$result" -ge 8 ]; then
-          echo "Java version check oK"
+          echo "Java version check ok"
     else
         echo "No java 8 or higher found"
         echo "Please install java >= 8 first"
