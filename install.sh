@@ -95,6 +95,7 @@ curl -s https://api.github.com/repos/Jonbeckas/processWatcher/releases/latest \
 | cut -d : -f 2,3 \
 | tr -d \" \
 | wget -q --show-progress -i -
+echo Set wrapper shell files
 echo -e "#!/bin/sh\njava -jar /usr/bin/processWatcher.jar" > /usr/bin/watcher
 echo -e "#!/bin/sh\njava -jar /usr/bin/processWatchercli.jar" > /usr/bin/watchercli
 echo Set File to executable
