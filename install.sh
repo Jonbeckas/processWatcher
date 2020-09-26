@@ -46,7 +46,7 @@ oldversion
 if [ $OLDVERSION == true ]; then
   echo "Detect an processWatcher Version!"
   echo "Do you want to perform an update?[Y/N]"
-  read input
+  read input </dev/tty
   if [ "$input" == "Y" ] || [ "$input" == "y" ]; then
       echo "Update ProcessWatcher"
     if test -f "watcher"; then
