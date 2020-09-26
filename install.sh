@@ -52,7 +52,7 @@ function checkjava() {
   fi
 }
 
-
+echo PROCESSWATCHER INSTALL SCRIPT
 if [ "$EUID" -ne 0 ]
   then echo "Bitte führen sie das script als root aus!"
   exit
