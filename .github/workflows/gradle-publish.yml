@@ -23,7 +23,7 @@ jobs:
     - name: Build with Unix
       run: gradle buildUnix
     - name: Set jarFile
-      run: echo ::set-env name=JARFILE::$(ls ./build/libs/*.jar| head -1)
+      run: echo ::set-env name=JARFILE::$(ls ./deamon/build/libs/*.jar| head -1)
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -56,5 +56,27 @@ jobs:
         asset_path: ./build/libs/watcher
         asset_name: watcher
         asset_content_type:  application/java-archive
-      
-  
+    - name: Set jarFile
+      run: echo ::set-env name=JARFILECLI::$(ls ./cli/build/libs/*.jar| head -1)
+    - name: Upload Release Asset Jar CLI
+      id: upload-release-asset-cli
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ${{env.JARFILE}}
+        asset_name: processWatchercli.jar
+        asset_content_type: application/java-archive
+    - name: Upload Release Asset Unix CLI
+      id: upload-release-asset-unix-cli
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./cli/build/libs/watcher
+        asset_name: watchercli
+        asset_content_type: application/java-archive
+
+
