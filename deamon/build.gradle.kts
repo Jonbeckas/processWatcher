@@ -10,11 +10,17 @@ version = "2.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    jcenter()
+    maven ( url="https://jitpack.io" )
 }
 dependencies {
     implementation("com.beust:klaxon:5.4")
-    implementation("commons-io:commons-io:2.4")
+    implementation("org.junit.jupiter:junit-jupiter:5.4.2")
+    implementation("co.gongzh.procbridge:procbridge:1.1.1")
+    implementation(project(":communication"))
     testImplementation(kotlin("test-junit"))
+    testImplementation(project(":cli"))
+    implementation(kotlin("stdlib-jdk8"))
 }
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"
@@ -41,3 +47,11 @@ task<Exec>("testUnix") {
     commandLine("./watcher")
 }
 
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}

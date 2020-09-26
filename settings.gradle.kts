@@ -1,3 +1,6 @@
 
-rootProject.name = "processWatcherKotlin"
+rootProject.name = "processWatcher"
+include("deamon")
+include("cli")
+include("communication")
 

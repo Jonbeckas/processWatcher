@@ -14,19 +14,20 @@ class KeepAlive(
     val id: String,
     val directory:String,
     var test: KeepAliveTestConfig? = null,
-    private var thread: Thread? = null,
+    var enabled: Boolean,
+    private var threadActive:Boolean=true,
     private var passedAttempts: Int = 1,
 ) {
 
     public fun start() {
-        this.thread = Thread {
+        Thread {
             writeToLog("[PROCESS_WATCHER ${Utils.getDateAsString(LocalDateTime.now())}] Start Process \n")
             startAsync();
-        }
-        this.thread?.start();
+        }.start()
     }
 
     private fun startAsync() {
+        this.threadActive = true
         val parts: ArrayList<String> = this.arguments.clone() as ArrayList<String>
         parts.add(0, this.process)
         val process = ProcessBuilder(*parts.toTypedArray())
@@ -35,45 +36,72 @@ class KeepAlive(
             .start();
         val log = BufferedReader(InputStreamReader(process.inputStream))
         var line: String? = log.readLine();
-        while (line != null) {
+        while (line != null&& threadActive) {
             writeStdOut(line)
             line = log.readLine()
         }
-
-        if (this.passedAttempts < this.attempts) {
-            writeToLog("[PROCESS_WATCHER ${Utils.getDateAsString(LocalDateTime.now())}] Process Stopped, Restart! \n")
-            passedAttempts++
-            startAsync();
-        } else if (this.passedAttempts == this.attempts){
-            writeToLog("[PROCESS_WATCHER ${Utils.getDateAsString(LocalDateTime.now())}] Reached max retries! \n")
+        if (threadActive && this.enabled) {
+            if (this.passedAttempts < this.attempts) {
+                writeToLog("[PROCESS_WATCHER ${Utils.getDateAsString(LocalDateTime.now())}] Process Stopped, Restart! \n")
+                passedAttempts++
+                startAsync();
+            } else if (this.passedAttempts == this.attempts) {
+                writeToLog("[PROCESS_WATCHER ${Utils.getDateAsString(LocalDateTime.now())}] Reached max retries! \n")
+            }
+        } else {
+            process.destroyForcibly()
+            return
         }
     }
 
-    public fun restart(config: KeepAliveConfig, attempts: Int) {
+     fun restart(config: KeepAliveConfig, attempts: Int) {
         this.process = config.process
         this.arguments = config.arguments
         this.test = config.test
         this.attempts = attempts;
+         restart()
+    }
+
+    fun restart() {
+        if (!this.enabled) return
         val oldAttemps = this.passedAttempts;
         this.passedAttempts = 0
         println("Run evt restarts for ${this.id}")
         if (this.test!=null) {
             if (getTestResult(this.test!!.test) == this.test!!.expect) {
-                if (oldAttemps > this.attempts) {
+                if (oldAttemps > this.attempts && this.threadActive) {
                     writeToLog("[PROCESS_WATCHER ${Utils.getDateAsString(LocalDateTime.now())}] Reset attempts\n")
                     startAsync()
                 }
             } else {
-                this.thread?.interrupt();
+                stop()
                 writeToLog("[PROCESS_WATCHER ${Utils.getDateAsString(LocalDateTime.now())}] Restart after failed test\n")
                 start()
             }
         } else {
-            if (oldAttemps >= this.attempts) {
+            if (oldAttemps >= this.attempts && this.threadActive) {
                 writeToLog("[PROCESS_WATCHER ${Utils.getDateAsString(LocalDateTime.now())}] Reset attempts\n")
                 startAsync()
             }
         }
+    }
+
+    fun isRunning():Boolean {
+        return this.threadActive
+    }
+
+    fun stop() {
+        this.threadActive = false;
+        writeToLog("[PROCESS_WATCHER ${Utils.getDateAsString(LocalDateTime.now())}] Manually Stopped keepalive\n")
+    }
+
+    fun setEnablet(boolean: Boolean) {
+        this.enabled = boolean;
+        val state = if(boolean){ "enabled"} else {"disabled"}
+        writeToLog("[PROCESS_WATCHER ${Utils.getDateAsString(LocalDateTime.now())}] Manually $state keepalive\n")
+    }
+    fun isEnabled(): Boolean {
+        return this.enabled
     }
 
     private fun getTestResult(test:String): String {

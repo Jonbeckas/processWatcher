@@ -14,7 +14,7 @@ values: start, stop
 
 log <id> -> shows logs (acces files)
 service start/stop -> start stops watcher
-start/stop/disable/enable <id> ->
+start/stop/disable/enable/forcedisable <id> ->
 
 
-{"key":"START","value":"lol"}
+{"alive":"START","value":"lol"}

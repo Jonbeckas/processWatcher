@@ -1,5 +1,4 @@
 import java.io.File
-import java.lang.Exception
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -13,6 +12,27 @@ class Utils {
             ).path
         }
 
+        fun getOsPathWithOut(): String {
+            return if (isUnix()) {
+                val file = File("/etc/processwatcher/")
+                if (file.canWrite()) {
+                    file.path;
+                } else {
+                    val jarPath = File(getCleanPath())
+                    if (jarPath.canWrite()) {
+                        println("Cannot acces /etc/processwatcher. Writing instead to '${jarPath.path}'")
+                        jarPath.path
+                    } else {
+                        val local = File("")
+                        println("Cannot acces /etc/processwatcher. Writing instead to '${local.path}'")
+                        local.path
+                    }
+                }
+            } else {
+                getCleanPath();
+            }
+        }
+
         fun getOsPath(): String {
             return if (isUnix()) {
                 val file = File("/etc/processwatcher/")
@@ -21,11 +41,9 @@ class Utils {
                 } else {
                     val jarPath = File(getCleanPath())
                     if (jarPath.canWrite()) {
-                        println("Cannot acces /etc/processwatcher. Writing to instead to '${jarPath.path}'")
                         jarPath.path
                     } else {
                         val local = File("")
-                        println("Cannot acces /etc/processwatcher. Writing to instead to '${local.path}'")
                         local.path
                     }
                 }
