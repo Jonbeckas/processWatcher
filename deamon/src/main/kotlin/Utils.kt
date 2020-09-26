@@ -35,7 +35,7 @@ class Utils {
 
         fun getOsPath(): String {
             return if (isUnix()) {
-                val file = File("/etc/processwatcher/")
+                val file = File("/usr/share/processwatcher/")
                 if (file.canWrite()) {
                     file.path;
                 } else {
