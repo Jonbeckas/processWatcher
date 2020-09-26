@@ -48,7 +48,6 @@ task<Exec>("buildUnix") {
     dependsOn("shadowJar")
     commandLine("bash","-c","echo $block > watcher")
     commandLine("bash","-c","cat *.jar >> watcher")
-    commandLine("chmod","+x","watcher")
 }
 
 task<Exec>("testUnix") {
