@@ -20,12 +20,12 @@ class Utils {
                 } else {
                     val jarPath = File(getCleanPath())
                     if (jarPath.canWrite()) {
-                        println("Cannot acces /etc/processwatcher. Writing instead to '${jarPath.path}'")
+                        println("Cannot acces /usr/share/processwatcher/. Writing instead to '${jarPath.path}'")
                         jarPath.path
                     } else {
-                        val local = File("")
-                        println("Cannot acces /etc/processwatcher. Writing instead to '${local.path}'")
-                        local.path
+                        val local = System.getProperty("user.dir")
+                        println("Cannot acces ${jarPath}. Writing instead to '${local}'")
+                        local
                     }
                 }
             } else {
@@ -43,8 +43,8 @@ class Utils {
                     if (jarPath.canWrite()) {
                         jarPath.path
                     } else {
-                        val local = File("")
-                        local.path
+                        val local = System.getProperty("user.dir")
+                        local
                     }
                 }
             } else {

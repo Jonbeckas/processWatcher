@@ -52,3 +52,10 @@ task<Exec>("buildUnix") {
     commandLine("bash","-c","echo \"#!/usr/bin/java -jar\" > watchercli")
     commandLine("bash","-c","cat *.jar >> watchercli")
 }
+
+task<Exec>("testInstallUnix") {
+    dependsOn("buildUnix")
+    workingDir("./build/libs")
+    dependsOn("buildUnix")
+    commandLine("mv","watchercli","/usr/bin/watchercli")
+}

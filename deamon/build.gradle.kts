@@ -47,6 +47,13 @@ task<Exec>("testUnix") {
     commandLine("./watcher")
 }
 
+task<Exec>("testInstallUnix") {
+    dependsOn("buildUnix")
+    workingDir("./build/libs")
+    dependsOn("buildUnix")
+    commandLine("mv","watcher","/usr/bin/watcher")
+}
+
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
     jvmTarget = "1.8"
