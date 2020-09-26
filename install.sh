@@ -1,10 +1,10 @@
 #!/bin/bash
 function oldversion() {
     OLDVERSION=false
-    if test -f "watcher"; then
+    if test -f "processWatcher.jar"; then
         OLDVERSION=true
     fi
-    if test -f "watchercli"; then
+    if test -f "processWatchercli.jar"; then
       OLDVERSION=true
     fi
 }
@@ -68,9 +68,11 @@ if [ $OLDVERSION == true ]; then
       echo "Update ProcessWatcher"
     if test -f "watcher"; then
         rm watcher
+        rm processWatcher.jar
     fi
     if test -f "watchercli"; then
       rm watchercli
+      rm processWatchercli.jar
     fi
   elif [ "$input" == "N" ] || [ "$input" == "n" ]; then
     echo "Nothing to Do!"
@@ -84,10 +86,19 @@ if [ $OLDVERSION == true ]; then
 fi
 
 curl -s https://api.github.com/repos/Jonbeckas/processWatcher/releases/latest \
-| grep "watcher" \
+| grep "processWatcher.jar" \
 | cut -d : -f 2,3 \
 | tr -d \" \
 | wget -q --show-progress -i -
-
-chmod a+x watcher
-chmod a+x watchercli
+curl -s https://api.github.com/repos/Jonbeckas/processWatcher/releases/latest \
+| grep "processWatchercli.jar" \
+| cut -d : -f 2,3 \
+| tr -d \" \
+| wget -q --show-progress -i -
+echo -e "#!/bin/sh\njava -jar /usr/bin/processWatcher.jar" > /usr/bin/watcher
+echo -e "#!/bin/sh\njava -jar /usr/bin/processWatchercli.jar" > /usr/bin/watchercli
+echo Set File to executable
+chmod +x processWatcher.jar
+chmod +x processWatchercli.jar
+chmod +x watcher
+chmod +x watchercli

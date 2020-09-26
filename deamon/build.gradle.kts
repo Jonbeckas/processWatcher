@@ -34,11 +34,21 @@ tasks.withType<KotlinCompile> {
 }
 
 task<Exec>("buildUnix") {
+    val block = "#!/bin/sh\n" +
+            "MYSELF=`which \"\$0\" 2>/dev/null`\n" +
+            "[ \$? -gt 0 -a -f \"\$0\" ] && MYSELF=\"./\$0\"\n" +
+            "java=java\n" +
+            "if test -n \"\$JAVA_HOME\"; then\n" +
+            "    java=\"\$JAVA_HOME/bin/java\"\n" +
+            "fi\n" +
+            "exec \"$java\" \$java_args -jar \$MYSELF \"\$@\"\n" +
+            "exit 1"
     workingDir("./build/libs")
     commandLine("rm *.jar")
     dependsOn("shadowJar")
-    commandLine("bash","-c","echo \"#!/usr/bin/java -jar\" > watcher")
+    commandLine("bash","-c","echo $block > watcher")
     commandLine("bash","-c","cat *.jar >> watcher")
+    commandLine("chmod","+x","watcher")
 }
 
 task<Exec>("testUnix") {
