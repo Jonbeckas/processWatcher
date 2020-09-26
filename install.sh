@@ -21,17 +21,34 @@ function checkjava() {
       echo "Please install java >= 8 first"
       exit
   fi
-
-  if [[ "$_java" ]]; then
-      Version=$($_java -version 2>&1 | sed -E -n 's/.* version "([^.-]*).*"/\1/p' | cut -d' ' -f1)
-      echo Detect java Version "$Version"
-      if [ "$Version" -ge 8 ]; then
+  local IFS=$'\n'
+  # remove \r for Cygwin
+  local lines=$("$_java" -Xms32M -Xmx32M -version 2>&1 | tr '\r' '\n')
+  if [[ -z $_java ]]
+  then
+    result=no_java
+  else
+    for line in $lines; do
+      if [[ (-z $result) && ($line = *"version \""*) ]]
+      then
+        local ver=$(echo $line | sed -e 's/.*version "\(.*\)"\(.*\)/\1/; 1q')
+        # on macOS, sed doesn't support '?'
+        if [[ $ver = "1."* ]]
+        then
+          result=$(echo $ver | sed -e 's/1\.\([0-9]*\)\(.*\)/\1/; 1q')
+        else
+          result=$(echo $ver | sed -e 's/\([0-9]*\)\(.*\)/\1/; 1q')
+        fi
+      fi
+    done
+    echo Detect Java "$result"
+    if [ "$result" -ge 8 ]; then
           echo "Java version check oK"
-      else
+    else
         echo "No java 8 or higher found"
         echo "Please install java >= 8 first"
         exit
-      fi
+   fi
   fi
 }
 
