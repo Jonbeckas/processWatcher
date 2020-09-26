@@ -20,8 +20,8 @@ jobs:
         java-version: 1.8
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
-    - name: Build with Unix
-      run: gradle buildUnix
+    - name: Build
+      run: gradle shadowJar
     - name: Set jarFile
       run: echo ::set-env name=JARFILE::$(ls ./deamon/build/libs/*.jar| head -1)
     - name: Create Release
@@ -46,16 +46,6 @@ jobs:
         asset_path: ${{env.JARFILE}}
         asset_name: processWatcher.jar
         asset_content_type:  application/java-archive
-    - name: Upload Release Asset Unix
-      id: upload-release-asset-lin 
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./deamon/build/libs/watcher
-        asset_name: watcher
-        asset_content_type:  application/java-archive
     - name: Set jarFile
       run: echo ::set-env name=JARFILECLI::$(ls ./cli/build/libs/*.jar| head -1)
     - name: Upload Release Asset Jar CLI
@@ -67,16 +57,6 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         asset_path: ${{env.JARFILECLI}}
         asset_name: processWatchercli.jar
-        asset_content_type: application/java-archive
-    - name: Upload Release Asset Unix CLI
-      id: upload-release-asset-unix-cli
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./cli/build/libs/watchercli
-        asset_name: watchercli
         asset_content_type: application/java-archive
 
 
